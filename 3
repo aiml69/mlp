@@ -1,0 +1,76 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+
+data = {
+    'Hours_Studied': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Scores': [15, 25, 35, 45, 50, 60, 70, 75, 85, 95]
+}
+df = pd.DataFrame(data)
+
+
+sns.scatterplot(x='Hours_Studied', y='Scores', data=df)
+plt.title("Study Hours vs Scores")
+plt.grid(True)
+plt.show()
+
+
+X = df[['Hours_Studied']]  # Feature (2D)
+y = df['Scores']           # Target (1D)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+
+print(f"R-squared: {r2_score(y_test, y_pred):.2f}")
+print(f"MAE: {mean_absolute_error(y_test, y_pred):.2f}")
+print(f"MSE: {mean_squared_error(y_test, y_pred):.2f}")
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred)):.2f}")
+
+sns.scatterplot(x='Hours_Studied', y='Scores', data=df, label='Actual Data')
+plt.plot(df['Hours_Studied'], model.predict(X), color='red', label='Regression Line')
+plt.legend()
+plt.grid(True)
+plt.title("Regression Line using scikit-learn")
+plt.show()
+
+
+
+X = np.array([1,2,3,4,5,6,7,8,9,10])
+y = np.array([15,25,35,45,50,60,70,75,85,95])
+m = len(X)
+
+
+theta0 = 0  # Intercept
+theta1 = 0  # Slope
+alpha = 0.01  # Learning rate
+epochs = 1000
+
+for i in range(epochs):
+    y_pred = theta0 + theta1 * X
+    error = y - y_pred
+    cost = (1/(2*m)) * np.sum(error**2)
+
+    
+    theta0 += alpha * (1/m) * np.sum(error)
+    theta1 += alpha * (1/m) * np.sum(error * X)
+
+    if i % 100 == 0:
+        print(f"Epoch {i}, Cost: {cost:.2f}, θ0: {theta0:.2f}, θ1: {theta1:.2f}")
+
+plt.scatter(X, y, color='blue', label='Actual Data')
+plt.plot(X, theta0 + theta1 * X, color='green', label='Gradient Descent Line')
+plt.title("Gradient Descent Regression Line")
+plt.xlabel("Hours Studied")
+plt.ylabel("Scores")
+plt.legend()
+plt.grid(True)
+plt.show()
